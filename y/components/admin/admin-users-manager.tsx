@@ -345,8 +345,10 @@ export function AdminUsersManager({
                           <Button
                             variant="ghost"
                             size="icon"
+                            className="disabled:opacity-40"
                             aria-label="编辑角色"
-                            title="编辑角色"
+                            title={isSelf ? "不能修改自己的角色" : "编辑角色"}
+                            disabled={isSelf}
                             onClick={() => setEditTarget(u)}
                           >
                             <Pencil />
