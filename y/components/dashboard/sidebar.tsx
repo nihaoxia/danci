@@ -1,31 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { BookText, Library, Users, LogOut } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { BookText, Library, Users, LogOut, Loader2 } from "lucide-react";
+import { useTransition } from "react";
 
-import { useAuth } from "@/components/providers/auth-provider";
+import { signoutAction } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
+import type { SessionUser } from "@/lib/session";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { href: "/books", label: "单词书管理", icon: Library },
-  { href: "/admin-users", label: "管理员管理", icon: Users },
+const allNavItems = [
+  { href: "/books", label: "单词书管理", icon: Library, superOnly: false },
+  { href: "/admin-users", label: "管理员管理", icon: Users, superOnly: true },
 ];
 
-export function Sidebar() {
+export function Sidebar({ user }: { user: SessionUser }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, signOut } = useAuth();
+  const [pending, startTransition] = useTransition();
 
-  function handleLogout() {
-    signOut();
-    router.replace("/signin");
-  }
+  const navItems = allNavItems.filter(
+    (item) => !item.superOnly || user.role === "super"
+  );
 
   return (
     <aside className="bg-sidebar text-sidebar-foreground flex h-full w-60 shrink-0 flex-col border-r border-sidebar-border">
-      {/* 品牌 */}
       <div className="flex h-16 items-center gap-2 border-b border-sidebar-border px-5">
         <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
           <BookText className="size-4" />
@@ -33,7 +32,6 @@ export function Sidebar() {
         <span className="text-base font-semibold">单词后台</span>
       </div>
 
-      {/* 导航 */}
       <nav className="flex flex-1 flex-col gap-1 p-3">
         {navItems.map((item) => {
           const active = pathname === item.href;
@@ -56,29 +54,39 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* 底部用户区 */}
       <div className="flex items-center justify-between gap-2 border-t border-sidebar-border p-3">
         <div className="flex min-w-0 items-center gap-2">
           <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground uppercase">
-            {user?.email?.[0] ?? "U"}
+            {user.email[0]}
           </div>
           <span
             className="truncate text-sm text-sidebar-foreground"
-            title={user?.email}
+            title={user.email}
           >
-            {user?.email ?? "未登录"}
+            {user.email}
           </span>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-muted-foreground hover:text-foreground"
-          onClick={handleLogout}
-          aria-label="退出登录"
-          title="退出登录"
+        <form
+          action={() => {
+            startTransition(() => signoutAction());
+          }}
         >
-          <LogOut className="size-4" />
-        </Button>
+          <Button
+            type="submit"
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground hover:text-foreground"
+            aria-label="退出登录"
+            title="退出登录"
+            disabled={pending}
+          >
+            {pending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <LogOut className="size-4" />
+            )}
+          </Button>
+        </form>
       </div>
     </aside>
   );
