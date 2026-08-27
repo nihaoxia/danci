@@ -351,17 +351,17 @@ export function BooksManager({
         </div>
 
         <div className="bg-card rounded-xl border">
-          <Table>
+          <Table className="table-fixed">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[64px]">封面</TableHead>
-                <TableHead className="min-w-[140px]">标题</TableHead>
-                <TableHead className="w-[110px] text-right">单词数量</TableHead>
-                <TableHead className="w-[110px] text-right">实际单词数</TableHead>
-                <TableHead className="w-[160px]">bookId</TableHead>
-                <TableHead className="min-w-[120px]">标签</TableHead>
-                <TableHead className="w-[110px]">创建时间</TableHead>
-                <TableHead className="w-[72px] text-right">操作</TableHead>
+                <TableHead className="w-[7%]">封面</TableHead>
+                <TableHead className="w-[19%]">标题</TableHead>
+                <TableHead className="w-[10%] text-center">单词数量</TableHead>
+                <TableHead className="w-[10%] text-center">实际单词数</TableHead>
+                <TableHead className="w-[17%] text-center">bookId</TableHead>
+                <TableHead className="w-[18%]">标签</TableHead>
+                <TableHead className="w-[11%]">创建时间</TableHead>
+                <TableHead className="w-[8%] text-center">操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -380,18 +380,20 @@ export function BooksManager({
                     <TableCell>
                       <Cover url={book.coverUrl} title={book.title} />
                     </TableCell>
-                    <TableCell className="font-medium">{book.title}</TableCell>
-                    <TableCell className="text-right tabular-nums">
+                    <TableCell className="font-medium">
+                      <div className="truncate">{book.title}</div>
+                    </TableCell>
+                    <TableCell className="text-center tabular-nums">
                       {book.wordCount.toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-right tabular-nums">
+                    <TableCell className="text-center tabular-nums">
                       {book.actualCount > 0 ? (
                         book.actualCount.toLocaleString()
                       ) : (
                         <span className="text-muted-foreground">0</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                       {book.bookId ? (
                         <Badge variant="secondary" className="text-[11px]">
                           {book.bookId}
@@ -420,8 +422,8 @@ export function BooksManager({
                     <TableCell className="text-muted-foreground">
                       {formatDate(book.createdAt)}
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
+                    <TableCell className="text-center">
+                      <div className="flex justify-center gap-1">
                         <Button
                           variant="ghost"
                           size="icon"
