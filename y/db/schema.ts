@@ -72,3 +72,40 @@ export const words = pgTable("words", {
 });
 
 export type Word = typeof words.$inferSelect;
+
+// 单词书表
+// bookId 与 words.bookId 建立一对一关联（一本书关联一个 bookId）
+export const books = pgTable("books", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
+  title: text("title").notNull(),
+  wordCount: integer("word_count").notNull().default(0),
+  coverUrl: text("cover_url"),
+  bookId: text("book_id").notNull().unique(),
+  tags: text("tags")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`)
+    .$onUpdate(() => new Date()),
+});
+
+export type Book = typeof books.$inferSelect;
+
+// Drizzle 关联关系：一本书对应多个单词，一个单词属于一本书
+export const booksRelations = relations(books, ({ many }) => ({
+  words: many(words),
+}));
+
+export const wordsRelations = relations(words, ({ one }) => ({
+  book: one(books, {
+    fields: [words.bookId],
+    references: [books.bookId],
+  }),
+}));

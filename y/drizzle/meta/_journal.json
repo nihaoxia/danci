@@ -8,6 +8,13 @@
       "when": 1787745615652,
       "tag": "0000_freezing_starfox",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787822590842,
+      "tag": "0001_panoramic_black_cat",
+      "breakpoints": true
     }
   ]
 }
