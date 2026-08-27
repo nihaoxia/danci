@@ -1,5 +1,8 @@
 import { relations, sql } from "drizzle-orm";
 import {
+  bigint,
+  integer,
+  json,
   pgEnum,
   pgTable,
   text,
@@ -56,3 +59,16 @@ export const adminSessionsRelations = relations(adminSessions, ({ one }) => ({
 
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type AdminRole = (typeof adminRole.enumValues)[number];
+
+// 单词表
+export const words = pgTable("words", {
+  id: bigint("id", { mode: "number" })
+    .primaryKey()
+    .generatedByDefaultAsIdentity(),
+  wordRank: integer("wordRank"),
+  headWord: text("headWord"),
+  content: json("content"),
+  bookId: text("bookId"),
+});
+
+export type Word = typeof words.$inferSelect;

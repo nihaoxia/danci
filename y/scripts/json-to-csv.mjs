@@ -7,7 +7,7 @@ import { dirname, basename, join, extname } from "node:path";
 
 const inputPath =
   process.argv[2] ||
-  "c:\\Users\\34140\\Desktop\\ai-coding\\danci\\y\\temp\\PEPXiaoXue3_2.json";
+  "c:\\Users\\34140\\Desktop\\ai-coding\\danci\\y\\temp\\PEPXiaoXue6_1.json";
 
 const raw = readFileSync(inputPath, "utf-8").replace(/^\uFEFF/, "").trim();
 
