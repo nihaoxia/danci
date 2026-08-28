@@ -127,7 +127,7 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
           {/* 整卡可点进详情；发音按钮内部已阻止冒泡 */}
           <Link
             href={`/word/${bookId}/${current.rank}`}
-            className="block rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-colors hover:border-indigo-300"
+            className="block select-none touch-manipulation rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-colors hover:border-indigo-300"
           >
             <div className="flex flex-col items-center py-4 text-center">
               <span className="text-3xl font-semibold text-gray-900">
@@ -163,19 +163,19 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
             </div>
           </Link>
 
-          <div className="mt-4 flex gap-3">
+          <div className="mt-4 flex select-none gap-3">
             <button
               type="button"
               onClick={handlePrev}
               disabled={index === 0}
-              className="h-11 flex-1 rounded-md border border-gray-200 bg-white text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+              className="h-11 flex-1 touch-manipulation rounded-md border border-gray-200 bg-white text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
               上一个
             </button>
             <button
               type="button"
               onClick={handleNext}
-              className="h-11 flex-1 rounded-md bg-indigo-600 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
+              className="h-11 flex-1 touch-manipulation rounded-md bg-indigo-600 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
             >
               {isLast ? '完成' : '下一个'}
             </button>
