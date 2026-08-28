@@ -70,27 +70,27 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
       if (existing && wordRank <= existing.lastWordRank) return prev;
       const next = existing
         ? prev.map((p) =>
-            p.bookId === bookId
-              ? {
-                  ...p,
-                  lastWordRank: wordRank,
-                  learnedCount:
-                    wordRank > p.lastWordRank ? p.learnedCount + 1 : p.learnedCount,
-                  updatedAt: new Date().toISOString(),
-                }
-              : p
-          )
-        : [
-            ...prev,
-            {
-              bookId,
-              title: '', // 服务端返回后带上真实书名
-              wordCount: 0,
+          p.bookId === bookId
+            ? {
+              ...p,
               lastWordRank: wordRank,
-              learnedCount: 1,
+              learnedCount:
+                wordRank > p.lastWordRank ? p.learnedCount + 1 : p.learnedCount,
               updatedAt: new Date().toISOString(),
-            },
-          ];
+            }
+            : p
+        )
+        : [
+          ...prev,
+          {
+            bookId,
+            title: '', // 服务端返回后带上真实书名
+            wordCount: 0,
+            lastWordRank: wordRank,
+            learnedCount: 1,
+            updatedAt: new Date().toISOString(),
+          },
+        ];
       return next;
     });
     // 服务端持久化：词级幂等插入 + 书级 greatest 前进，返回值覆盖为服务端真值
@@ -102,6 +102,14 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
   }, [email]);
 
   const hydrated = status !== 'loading' && (!email || progressLoaded || loadedForRef.current === email);
+
+  // 预热发音 CDN：进入应用时建立一次 keep-alive 连接（并让浏览器缓存 DNS/TLS），
+  // 否则登录后第一次点发音要先建连，会有明显延迟；预热后首次点击即秒出声
+  useEffect(() => {
+    fetch('https://dict.youdao.com/dictvoice?audio=ok&type=1', { mode: 'no-cors' }).catch(() => {
+      // 预热失败无所谓，播放时浏览器会自行建连
+    });
+  }, []);
 
   const value = useMemo(
     () => ({ user: email ? { email } : null, hydrated, progressList, getProgress, saveProgress }),
