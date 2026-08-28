@@ -1,11 +1,12 @@
 // 单词详情页：按 bookId + wordRank 查询单词，完整渲染 content 各模块（模块为空时隐藏）
+// words 为准静态数据，ISR 缓存页面（60s）
 import Link from 'next/link';
 import { AudioButton } from '@/app/components/audio-button';
 import { ExpandableList } from '@/app/components/expandable-list';
 import { getBookByBookId, getWordByRank } from '@/db/queries';
 import { parseWordContent } from '@/db/word-content';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function WordPage({
   params,

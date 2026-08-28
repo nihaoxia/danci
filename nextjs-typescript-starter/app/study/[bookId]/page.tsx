@@ -1,11 +1,12 @@
 // 单词学习页：服务端从数据库查询书籍与单词，渲染交给客户端视图
+// words 为准静态数据，ISR 缓存页面（60s）
 import Link from 'next/link';
 import { StudyView } from '@/app/components/study-view';
 import type { CardWord } from '@/app/components/word-card';
 import { getBookByBookId, getWordsByBookId } from '@/db/queries';
 import { parseWordContent } from '@/db/word-content';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function StudyPage({
   params,
