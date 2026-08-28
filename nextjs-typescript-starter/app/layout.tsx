@@ -1,20 +1,15 @@
 import './globals.css';
 
 import { GeistSans } from 'geist/font/sans';
+import { MockAuthProvider } from '@/app/components/mock-auth';
+import { TabBar } from '@/app/components/tab-bar';
 
-let title = 'Next.js + Postgres Auth Starter';
-let description =
-  'This is a Next.js starter kit that uses NextAuth.js for simple email + password login and a Postgres database to persist the data.';
+const title = '单词学习';
+const description = '移动端单词学习 H5：卡片式背单词，记录学习进度';
 
 export const metadata = {
   title,
   description,
-  twitter: {
-    card: 'summary_large_image',
-    title,
-    description,
-  },
-  metadataBase: new URL('https://nextjs-postgres-auth.vercel.app'),
 };
 
 export default function RootLayout({
@@ -23,8 +18,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={GeistSans.variable}>{children}</body>
+    <html lang="zh-CN">
+      <body className={`${GeistSans.variable} bg-gray-100`}>
+        <MockAuthProvider>
+          <div className="mx-auto min-h-screen max-w-md bg-gray-50 pb-16 shadow-sm">
+            {children}
+          </div>
+          <TabBar />
+        </MockAuthProvider>
+      </body>
     </html>
   );
 }
