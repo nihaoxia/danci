@@ -1,5 +1,6 @@
 // 学习进度：DTO 定义 + 客户端请求函数（服务端 route 与 client 组件共用）
 // 进度数据全部来自真实数据库（user_book_progress / user_word_progress 联 books）
+// 身份由 NextAuth session cookie 决定，客户端无需传 email
 
 export interface BookProgress {
   bookId: string;
@@ -10,12 +11,10 @@ export interface BookProgress {
   updatedAt: string; // ISO 时间
 }
 
-/** 拉取某用户的全部书级进度（按 updatedAt 倒序） */
-export async function fetchProgress(email: string): Promise<BookProgress[]> {
+/** 拉取当前用户的全部书级进度（按 updatedAt 倒序）；未登录返回 [] */
+export async function fetchProgress(): Promise<BookProgress[]> {
   try {
-    const res = await fetch(`/api/progress?email=${encodeURIComponent(email)}`, {
-      cache: 'no-store',
-    });
+    const res = await fetch('/api/progress', { cache: 'no-store' });
     if (!res.ok) return [];
     return (await res.json()) as BookProgress[];
   } catch {
@@ -25,14 +24,13 @@ export async function fetchProgress(email: string): Promise<BookProgress[]> {
 
 /** 上报学习进度：词级幂等插入 + 书级 greatest 前进，返回服务端最新进度列表 */
 export async function saveProgressApi(
-  email: string,
   bookId: string,
   wordRank: number
 ): Promise<BookProgress[]> {
   const res = await fetch('/api/progress', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, bookId, wordRank }),
+    body: JSON.stringify({ bookId, wordRank }),
   });
   if (!res.ok) {
     throw new Error(`保存进度失败: ${res.status}`);

@@ -2,10 +2,12 @@
 
 // 「我的」页视图：未登录 → 引导卡片 + 登录/注册 popup；已登录 → 用户信息 + 学习进度
 // 单词书数据由服务端（app/me/page.tsx）从 books 表查询后传入，进度分母使用真实 wordCount
+// 登录态来自 NextAuth session（AuthProvider）；退出登录走 Server Action
 import Link from 'next/link';
 import { useState } from 'react';
+import { signOutAction } from '@/app/actions/auth';
 import { AuthPopup } from '@/app/components/auth-popup';
-import { useMockAuth } from '@/app/components/mock-auth';
+import { useAuth } from '@/app/components/auth-provider';
 import { ProgressBar } from '@/app/components/progress-bar';
 import type { Book } from '@/db/schema';
 
@@ -16,12 +18,8 @@ export function MeView({
   books: Book[];
   autoOpenLogin: boolean;
 }) {
-  const { user, hydrated, progressList, logout } = useMockAuth();
+  const { user, progressList } = useAuth();
   const [popupOpen, setPopupOpen] = useState(autoOpenLogin);
-
-  if (!hydrated) {
-    return <p className="p-8 text-center text-sm text-gray-400">加载中…</p>;
-  }
 
   // 已登录视图
   if (user) {
@@ -76,15 +74,14 @@ export function MeView({
           </ul>
         )}
 
-        <button
-          type="button"
-          onClick={logout}
-          className="mt-8 h-10 w-full rounded-md border border-gray-200 bg-white text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
-        >
-          退出登录
-        </button>
-
-        <AuthPopup open={popupOpen} onOpenChange={setPopupOpen} />
+        <form action={signOutAction}>
+          <button
+            type="submit"
+            className="mt-8 h-10 w-full rounded-md border border-gray-200 bg-white text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+          >
+            退出登录
+          </button>
+        </form>
       </div>
     );
   }

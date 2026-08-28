@@ -5,7 +5,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { useMockAuth } from '@/app/components/mock-auth';
+import { useAuth } from '@/app/components/auth-provider';
 import { WordCard, type CardWord } from '@/app/components/word-card';
 
 interface StudyBook {
@@ -21,7 +21,7 @@ export function StudyView({
   cardWords: CardWord[];
 }) {
   const router = useRouter();
-  const { user, hydrated, getProgress } = useMockAuth();
+  const { user, hydrated, getProgress } = useAuth();
 
   // 未登录访问学习页 → 我的页并自动弹出登录 popup
   useEffect(() => {

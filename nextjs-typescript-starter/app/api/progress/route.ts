@@ -1,8 +1,9 @@
-// 学习进度 API（真实数据库）
-// GET  /api/progress?email=xxx  → 该用户的全部书级进度（联 books，按 updatedAt 倒序）
-// POST /api/progress            → { email, bookId, wordRank } 词级幂等插入 + 书级 greatest 前进
+// 学习进度 API（真实数据库，身份来自 NextAuth session）
+// GET  /api/progress  → 当前用户的全部书级进度（联 books，按 updatedAt 倒序）
+// POST /api/progress  → { bookId, wordRank } 词级幂等插入 + 书级 greatest 前进
 import { NextResponse } from 'next/server';
 import { count, desc, eq, sql } from 'drizzle-orm';
+import { auth } from 'app/auth';
 
 import { db } from '@/db/index';
 import {
@@ -11,6 +12,12 @@ import {
   userWordProgress,
 } from '@/db/schema';
 import type { BookProgress } from '@/lib/progress';
+
+/** 从 session 取当前用户邮箱；未登录返回 null */
+async function getSessionEmail(): Promise<string | null> {
+  const session = await auth();
+  return session?.user?.email?.toLowerCase() ?? null;
+}
 
 /** 查询用户全部进度（书级 + 已学词数），按 updatedAt 倒序 */
 async function getProgressList(email: string): Promise<BookProgress[]> {
@@ -45,10 +52,10 @@ async function getProgressList(email: string): Promise<BookProgress[]> {
   }));
 }
 
-export async function GET(request: Request) {
-  const email = new URL(request.url).searchParams.get('email')?.trim().toLowerCase();
+export async function GET() {
+  const email = await getSessionEmail();
   if (!email) {
-    return NextResponse.json({ error: '缺少 email 参数' }, { status: 400 });
+    return NextResponse.json({ error: '未登录' }, { status: 401 });
   }
   try {
     return NextResponse.json(await getProgressList(email));
@@ -59,25 +66,28 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  let body: { email?: string; bookId?: string; wordRank?: number };
+  const email = await getSessionEmail();
+  if (!email) {
+    return NextResponse.json({ error: '未登录' }, { status: 401 });
+  }
+
+  let body: { bookId?: string; wordRank?: number };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: '请求体不是合法 JSON' }, { status: 400 });
   }
 
-  const email = body.email?.trim().toLowerCase();
   const { bookId } = body;
   const { wordRank } = body;
   if (
-    !email ||
     !bookId ||
     typeof wordRank !== 'number' ||
     !Number.isInteger(wordRank) ||
     wordRank < 1
   ) {
     return NextResponse.json(
-      { error: '参数不合法：需要 email / bookId / 正整数 wordRank' },
+      { error: '参数不合法：需要 bookId / 正整数 wordRank' },
       { status: 400 }
     );
   }

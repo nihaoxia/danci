@@ -1,9 +1,15 @@
 'use client';
 
 // 登录 / 注册弹窗：两种模式在同一弹窗内切换
-// Mock 阶段使用 useMockAuth().login / register；接入真实数据库后替换为 Server Actions
-import { useState } from 'react';
-import { useMockAuth } from '@/app/components/mock-auth';
+// 表单提交走 Server Actions（app/actions/auth.ts），成功后由 signIn 重定向回当前页面
+import { usePathname } from 'next/navigation';
+import { useState, useTransition } from 'react';
+
+import {
+  loginAction,
+  registerAction,
+  type AuthActionState,
+} from '@/app/actions/auth';
 
 interface AuthPopupProps {
   open: boolean;
@@ -11,12 +17,10 @@ interface AuthPopupProps {
 }
 
 export function AuthPopup({ open, onOpenChange }: AuthPopupProps) {
-  const { login, register } = useMockAuth();
+  const pathname = usePathname();
   const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+  const [pending, startTransition] = useTransition();
 
   if (!open) return null;
 
@@ -27,21 +31,20 @@ export function AuthPopup({ open, onOpenChange }: AuthPopupProps) {
     setError(null);
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    formData.set('redirectTo', pathname);
     setError(null);
-    setPending(true);
-    const err = isLogin
-      ? await login(email, password)
-      : await register(email, password);
-    setPending(false);
-    if (err) {
-      setError(err);
-    } else {
-      setEmail('');
-      setPassword('');
-      onOpenChange(false);
-    }
+    startTransition(async () => {
+      const action = isLogin ? loginAction : registerAction;
+      const res: AuthActionState = await action({}, formData);
+      if (res?.error) {
+        setError(res.error);
+      } else {
+        onOpenChange(false);
+      }
+    });
   }
 
   return (
@@ -93,10 +96,9 @@ export function AuthPopup({ open, onOpenChange }: AuthPopupProps) {
               />
             </svg>
             <input
+              name="email"
               type="email"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               placeholder="邮箱"
               autoComplete="email"
               className="w-full bg-transparent px-2 py-2.5 text-sm outline-none placeholder:text-gray-400"
@@ -119,10 +121,10 @@ export function AuthPopup({ open, onOpenChange }: AuthPopupProps) {
               />
             </svg>
             <input
+              name="password"
               type="password"
               required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              minLength={isLogin ? undefined : 6}
               placeholder="密码"
               autoComplete={isLogin ? 'current-password' : 'new-password'}
               className="w-full bg-transparent px-2 py-2.5 text-sm outline-none placeholder:text-gray-400"

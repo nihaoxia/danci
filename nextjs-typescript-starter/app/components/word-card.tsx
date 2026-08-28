@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { AudioButton } from '@/app/components/audio-button';
-import { useMockAuth } from '@/app/components/mock-auth';
+import { useAuth } from '@/app/components/auth-provider';
 
 export interface CardWord {
   rank: number;
@@ -22,7 +22,7 @@ interface WordCardProps {
 }
 
 export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
-  const { saveProgress } = useMockAuth();
+  const { saveProgress } = useAuth();
   const [index, setIndex] = useState(initialIndex);
   const [showList, setShowList] = useState(false);
 
@@ -214,8 +214,8 @@ function WordListPanel({
                 type="button"
                 onClick={() => onPick(i)}
                 className={`w-full rounded-lg border p-2.5 text-left transition-colors ${i === activeIndex
-                    ? 'border-indigo-300 bg-indigo-50'
-                    : 'border-gray-100 hover:border-indigo-200 hover:bg-gray-50'
+                  ? 'border-indigo-300 bg-indigo-50'
+                  : 'border-gray-100 hover:border-indigo-200 hover:bg-gray-50'
                   }`}
               >
                 <span className="block truncate text-sm font-medium text-gray-900">

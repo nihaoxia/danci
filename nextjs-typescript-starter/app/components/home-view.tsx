@@ -3,11 +3,11 @@
 // 首页视图（Tab 1）：最近学习（已登录）+ 全部单词书
 // 单词书数据由服务端（app/page.tsx）从 books 表查询后传入
 import Link from 'next/link';
-import { useMockAuth } from '@/app/components/mock-auth';
+import { useAuth } from '@/app/components/auth-provider';
 import type { Book } from '@/db/schema';
 
 export function HomeView({ books }: { books: Book[] }) {
-  const { user, hydrated, progressList } = useMockAuth();
+  const { user, hydrated, progressList } = useAuth();
 
   if (!hydrated) {
     return <p className="p-8 text-center text-sm text-gray-400">加载中…</p>;

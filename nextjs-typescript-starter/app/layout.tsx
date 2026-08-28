@@ -1,7 +1,7 @@
 import './globals.css';
 
 import { GeistSans } from 'geist/font/sans';
-import { MockAuthProvider } from '@/app/components/mock-auth';
+import { AuthProvider } from '@/app/components/auth-provider';
 import { TabBar } from '@/app/components/tab-bar';
 
 const title = '单词学习';
@@ -20,12 +20,12 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className={`${GeistSans.variable} bg-gray-100`}>
-        <MockAuthProvider>
+        <AuthProvider>
           <div className="mx-auto min-h-screen max-w-md bg-gray-50 pb-16 shadow-sm">
             {children}
           </div>
           <TabBar />
-        </MockAuthProvider>
+        </AuthProvider>
       </body>
     </html>
   );
