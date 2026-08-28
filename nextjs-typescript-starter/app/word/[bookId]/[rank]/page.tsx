@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { AudioButton } from '@/app/components/audio-button';
 import { ExpandableList } from '@/app/components/expandable-list';
 import { getBookByBookId, getWordByRank } from '@/db/queries';
-import { parseWordContent } from '@/db/word-content';
+import { parseWordContent, extractTrans } from '@/db/word-content';
 
 export const revalidate = 60;
 
@@ -34,7 +34,7 @@ export default async function WordPage({
   const headWord = word.headWord ?? '';
   const ukphone = content?.ukphone;
   const usphone = content?.usphone;
-  const trans = content?.trans ?? [];
+  const trans = content ? extractTrans(content) : [];
   const sentences = content?.sentence?.sentences ?? [];
   const phrases = content?.phrase?.phrases ?? [];
   const synos = content?.syno?.synos ?? [];
@@ -86,7 +86,7 @@ export default async function WordPage({
             {trans.map((t, i) => (
               <li key={i}>
                 <p className="text-sm text-gray-900">
-                  {t.descCn && <span className="mr-2 text-gray-500">{t.descCn}</span>}
+                  {t.pos && <span className="mr-2 text-gray-500">{t.pos}</span>}
                   {t.tranCn}
                 </p>
                 {t.tranOther && (

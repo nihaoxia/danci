@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { StudyView } from '@/app/components/study-view';
 import type { CardWord } from '@/app/components/word-card';
 import { getBookByBookId, getWordsByBookId } from '@/db/queries';
-import { parseWordContent } from '@/db/word-content';
+import { parseWordContent, extractTrans } from '@/db/word-content';
 
 export const revalidate = 60;
 
@@ -31,13 +31,13 @@ export default async function StudyPage({
   // 服务端预先裁剪的轻量卡片结构，避免传完整 content JSON
   const cardWords: CardWord[] = words.map((w) => {
     const content = parseWordContent(w.content)?.word.content;
-    const trans = content?.trans?.[0];
+    const trans = content ? extractTrans(content)[0] : undefined;
     const sentence = content?.sentence?.sentences?.[0];
     return {
       rank: w.wordRank ?? 0,
       headWord: w.headWord ?? '',
       phone: content?.usphone || content?.ukphone || '',
-      pos: trans?.descCn ?? '',
+      pos: trans?.pos ?? '',
       tranCn: trans?.tranCn ?? '',
       example: sentence ? { en: sentence.sContent, cn: sentence.sCn } : undefined,
     };

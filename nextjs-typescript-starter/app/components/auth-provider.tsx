@@ -11,6 +11,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import type { Session } from 'next-auth';
 import { SessionProvider, useSession } from 'next-auth/react';
 
 import { fetchProgress, saveProgressApi, type BookProgress } from '@/lib/progress';
@@ -127,9 +128,15 @@ function useCallbackRef<T extends (...args: never[]) => unknown>(
   return useMemo(() => fn, deps);
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({
+  session,
+  children,
+}: {
+  session: Session | null; // 服务端 auth() 初始 session：SSR 即登录态，刷新不闪未登录
+  children: React.ReactNode;
+}) {
   return (
-    <SessionProvider>
+    <SessionProvider session={session}>
       <AuthProviderInner>{children}</AuthProviderInner>
     </SessionProvider>
   );

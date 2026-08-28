@@ -1,16 +1,17 @@
 'use client';
 
-// 单词学习卡片：一次一卡，上一个/下一个切换，单词列表可跳转到任意单词
+// 单词学习卡片：一次一卡，上一个/下一个切换（顶部进度条联动），整卡可点进详情，单词列表可跳转
 import Link from 'next/link';
 import { useState } from 'react';
 import { AudioButton } from '@/app/components/audio-button';
 import { useAuth } from '@/app/components/auth-provider';
+import { ProgressBar } from '@/app/components/progress-bar';
 
 export interface CardWord {
   rank: number;
   headWord: string;
   phone: string; // usphone ?? ukphone
-  pos: string; // trans[0].descCn（词性）
+  pos: string; // 词性（extractTrans 推断）
   tranCn: string; // trans[0].tranCn
   example?: { en: string; cn: string }; // sentences[0]
 }
@@ -33,50 +34,53 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
   // 已学完本书
   if (completed) {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-sm">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.5}
-          className="h-12 w-12 text-indigo-500"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <div>
-          <p className="text-lg font-semibold text-gray-900">已学完本书</p>
-          <p className="mt-1 text-sm text-gray-500">可以从头复习巩固一下</p>
+      <div>
+        <ProgressBar value={words.length} total={words.length} className="mb-2" />
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-sm">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            className="h-12 w-12 text-indigo-500"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <div>
+            <p className="text-lg font-semibold text-gray-900">已学完本书</p>
+            <p className="mt-1 text-sm text-gray-500">可以从头复习巩固一下</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIndex(0)}
+            className="h-10 w-full rounded-md bg-indigo-600 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
+          >
+            从头复习
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowList(true)}
+            className="h-10 w-full rounded-md border border-gray-200 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+          >
+            查看单词列表
+          </button>
+          {showList && (
+            <WordListPanel
+              words={words}
+              activeIndex={null}
+              onPick={(i) => {
+                setIndex(i);
+                setShowList(false);
+              }}
+              onClose={() => setShowList(false)}
+            />
+          )}
         </div>
-        <button
-          type="button"
-          onClick={() => setIndex(0)}
-          className="h-10 w-full rounded-md bg-indigo-600 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
-        >
-          从头复习
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowList(true)}
-          className="h-10 w-full rounded-md border border-gray-200 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
-        >
-          查看单词列表
-        </button>
-        {showList && (
-          <WordListPanel
-            words={words}
-            activeIndex={null}
-            onPick={(i) => {
-              setIndex(i);
-              setShowList(false);
-            }}
-            onClose={() => setShowList(false)}
-          />
-        )}
       </div>
     );
   }
@@ -93,14 +97,16 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
 
   return (
     <div>
-      <div className="mb-2 flex items-center justify-between">
-        <p className="text-xs text-gray-500">
+      <div className="mb-2 flex items-center gap-3">
+        {/* 学习进度条：上一个/下一个切换实时联动 */}
+        <ProgressBar value={index + 1} total={words.length} className="flex-1" />
+        <span className="shrink-0 text-xs text-gray-500">
           {index + 1} / {words.length}
-        </p>
+        </span>
         <button
           type="button"
           onClick={() => setShowList((s) => !s)}
-          className="text-xs font-medium text-indigo-600 hover:text-indigo-500"
+          className="shrink-0 text-xs font-medium text-indigo-600 hover:text-indigo-500"
         >
           {showList ? '收起列表' : '查看所有单词'}
         </button>
@@ -118,14 +124,15 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
         />
       ) : (
         <>
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          {/* 整卡可点进详情；发音按钮内部已阻止冒泡 */}
+          <Link
+            href={`/word/${bookId}/${current.rank}`}
+            className="block rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-colors hover:border-indigo-300"
+          >
             <div className="flex flex-col items-center py-4 text-center">
-              <Link
-                href={`/word/${bookId}/${current.rank}`}
-                className="text-3xl font-semibold text-gray-900 hover:text-indigo-600"
-              >
+              <span className="text-3xl font-semibold text-gray-900">
                 {current.headWord}
-              </Link>
+              </span>
               {/* 发音直接放在卡片上：播放用单词本身拼接有道语音，不依赖音标字段，所有单词都可发音 */}
               <div className="mt-2 flex gap-2">
                 <AudioButton word={current.headWord} type={1} label="英" />
@@ -152,9 +159,9 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
                 </div>
               )}
 
-              <p className="mt-6 text-xs text-gray-400">点击单词查看详情</p>
+              <p className="mt-6 text-xs text-gray-400">点击卡片查看详情</p>
             </div>
-          </div>
+          </Link>
 
           <div className="mt-4 flex gap-3">
             <button

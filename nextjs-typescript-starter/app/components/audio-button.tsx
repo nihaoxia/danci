@@ -32,7 +32,12 @@ export function AudioButton({
       <audio ref={audioRef} src={src} preload="auto" className="hidden" />
       <button
         type="button"
-        onClick={play}
+        onClick={(e) => {
+          // 按钮可能位于整卡链接内部（学习卡片整卡可点进详情）：阻止触发导航
+          e.preventDefault();
+          e.stopPropagation();
+          play();
+        }}
         className="flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-100"
         aria-label={`播放${label}发音`}
       >
