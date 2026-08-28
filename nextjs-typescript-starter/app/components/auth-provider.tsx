@@ -8,7 +8,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import type { Session } from 'next-auth';
@@ -35,18 +34,16 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
   const email = session?.user?.email?.toLowerCase() ?? null;
   const [progressList, setProgressList] = useState<BookProgress[]>([]);
   const [progressLoaded, setProgressLoaded] = useState(false);
-  const loadedForRef = useRef<string | null>(null);
 
   // 登录（或 session 恢复）后从数据库拉取进度；未登录清空
+  // 注意：不能用「已拉取过」标记做防重——StrictMode 下 effect 会挂载两次，
+  // 第一次请求被 cleanup 取消后，第二次会被标记挡住，导致刷新后进度永远拉不回来
   useEffect(() => {
     if (!email) {
       setProgressList([]);
       setProgressLoaded(false);
-      loadedForRef.current = null;
       return;
     }
-    if (loadedForRef.current === email) return;
-    loadedForRef.current = email;
     let cancelled = false;
     fetchProgress().then((list) => {
       if (!cancelled) {
@@ -102,7 +99,7 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
       });
   }, [email]);
 
-  const hydrated = status !== 'loading' && (!email || progressLoaded || loadedForRef.current === email);
+  const hydrated = status !== 'loading' && (!email || progressLoaded);
 
   // 预热发音 CDN：进入应用时建立一次 keep-alive 连接（并让浏览器缓存 DNS/TLS），
   // 否则登录后第一次点发音要先建连，会有明显延迟；预热后首次点击即秒出声
