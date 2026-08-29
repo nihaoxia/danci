@@ -40,7 +40,7 @@ export function HomeView({ books }: { books: Book[] }) {
               <li key={progress.bookId}>
                 <Link
                   href={`/study/${progress.bookId}`}
-                  className="flex items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-colors hover:border-indigo-200"
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-sm transition-colors hover:border-[var(--border-strong)]"
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-gray-900">{book.title}</p>
@@ -48,7 +48,7 @@ export function HomeView({ books }: { books: Book[] }) {
                       已学 {progress.learnedCount}/{book.wordCount}
                     </p>
                   </div>
-                  <span className="flex shrink-0 items-center gap-0.5 text-xs font-medium text-indigo-600">
+                  <span className="flex shrink-0 items-center gap-0.5 text-xs font-medium text-[var(--primary-text)]">
                     继续学习
                     <svg
                       viewBox="0 0 24 24"
@@ -70,7 +70,7 @@ export function HomeView({ books }: { books: Book[] }) {
 
       <h2 className="mb-2 mt-6 text-base font-semibold text-gray-900">全部单词书</h2>
       {books.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-gray-200 bg-white p-6 text-center text-sm text-gray-400">
+        <p className="rounded-2xl border border-dashed border-gray-200 bg-[var(--card)] p-6 text-center text-sm text-gray-400">
           暂无单词书，快去后台添加吧
         </p>
       ) : (
@@ -91,9 +91,9 @@ function BookCard({ book, loggedIn }: { book: Book; loggedIn: boolean }) {
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-colors hover:border-indigo-200"
+      className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-sm transition-colors hover:border-[var(--border-strong)]"
     >
-      <div className="flex h-14 w-11 shrink-0 items-end justify-center rounded-md bg-gradient-to-br from-indigo-400 to-indigo-600 pb-1 text-center text-xs font-bold text-white">
+      <div className="flex h-14 w-11 shrink-0 items-end justify-center rounded-md bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] pb-1 text-center text-xs font-bold text-white">
         学
       </div>
       <div className="min-w-0 flex-1">

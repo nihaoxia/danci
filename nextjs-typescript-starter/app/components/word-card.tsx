@@ -42,7 +42,7 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
             fill="none"
             stroke="currentColor"
             strokeWidth={1.5}
-            className="h-12 w-12 text-indigo-500"
+            className="h-12 w-12 text-[var(--primary)]"
             aria-hidden="true"
           >
             <path
@@ -58,7 +58,7 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
           <button
             type="button"
             onClick={() => setIndex(0)}
-            className="h-10 w-full rounded-md bg-indigo-600 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
+            className="h-10 w-full rounded-md bg-[var(--primary)] text-sm font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
           >
             从头复习
           </button>
@@ -106,7 +106,7 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
         <button
           type="button"
           onClick={() => setShowList((s) => !s)}
-          className="shrink-0 text-xs font-medium text-indigo-600 hover:text-indigo-500"
+          className="shrink-0 text-xs font-medium text-[var(--primary-text)]"
         >
           {showList ? '收起列表' : '查看所有单词'}
         </button>
@@ -127,7 +127,7 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
           {/* 整卡可点进详情；发音按钮内部已阻止冒泡 */}
           <Link
             href={`/word/${bookId}/${current.rank}`}
-            className="block select-none touch-manipulation rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-colors hover:border-indigo-300"
+            className="block select-none touch-manipulation rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm transition-colors hover:border-[var(--border-strong)]"
           >
             <div className="flex flex-col items-center py-4 text-center">
               <span className="text-3xl font-semibold text-gray-900">
@@ -149,7 +149,7 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
               )}
 
               {current.example && (
-                <div className="mt-6 w-full rounded-xl bg-gray-50 p-4 text-left">
+                <div className="mt-6 w-full rounded-xl bg-[var(--card-soft)] p-4 text-left">
                   <p className="text-sm leading-relaxed text-gray-800">
                     {current.example.en}
                   </p>
@@ -175,7 +175,7 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
             <button
               type="button"
               onClick={handleNext}
-              className="h-11 flex-1 touch-manipulation rounded-md bg-indigo-600 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
+              className="h-11 flex-1 touch-manipulation rounded-md bg-[var(--primary)] text-sm font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
             >
               {isLast ? '完成' : '下一个'}
             </button>
@@ -221,8 +221,8 @@ function WordListPanel({
                 type="button"
                 onClick={() => onPick(i)}
                 className={`w-full rounded-lg border p-2.5 text-left transition-colors ${i === activeIndex
-                  ? 'border-indigo-300 bg-indigo-50'
-                  : 'border-gray-100 hover:border-indigo-200 hover:bg-gray-50'
+                  ? 'border-[var(--border-strong)] bg-[var(--primary-soft)]'
+                  : 'border-[var(--border)] hover:border-[var(--border-strong)] hover:bg-[var(--card-soft)]'
                   }`}
               >
                 <span className="block truncate text-sm font-medium text-gray-900">

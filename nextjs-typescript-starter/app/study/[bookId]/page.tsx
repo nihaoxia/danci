@@ -19,7 +19,7 @@ export default async function StudyPage({
   if (!book) {
     return (
       <EmptyState text="单词书不存在">
-        <Link href="/" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+        <Link href="/" className="text-sm font-medium text-[var(--primary-text)]">
           返回首页
         </Link>
       </EmptyState>

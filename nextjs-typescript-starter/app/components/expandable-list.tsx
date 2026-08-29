@@ -21,7 +21,7 @@ export function ExpandableList({
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="mt-2 text-xs font-medium text-indigo-600 hover:text-indigo-500"
+          className="mt-2 text-xs font-medium text-[var(--primary-text)]"
         >
           {expanded ? '收起' : `展开全部（还有 ${rest} 条）`}
         </button>

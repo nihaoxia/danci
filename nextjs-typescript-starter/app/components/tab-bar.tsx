@@ -33,7 +33,7 @@ export function TabBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex h-14 max-w-md items-stretch border-t border-gray-200 bg-white">
+    <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex h-14 max-w-md items-stretch border-t border-[var(--border)] bg-[var(--card)]">
       {tabs.map((tab) => {
         const active =
           tab.href === '/' ? pathname === '/' : pathname.startsWith(tab.href);
@@ -41,9 +41,8 @@ export function TabBar() {
           <Link
             key={tab.href}
             href={tab.href}
-            className={`flex flex-1 flex-col items-center justify-center gap-0.5 text-xs transition-colors ${
-              active ? 'text-indigo-600' : 'text-gray-400'
-            }`}
+            className={`flex flex-1 flex-col items-center justify-center gap-0.5 text-xs transition-colors ${active ? 'text-[var(--primary-text)]' : 'text-gray-400'
+              }`}
           >
             <svg
               viewBox="0 0 24 24"

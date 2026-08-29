@@ -9,6 +9,7 @@ import { signOutAction } from '@/app/actions/auth';
 import { AuthPopup } from '@/app/components/auth-popup';
 import { useAuth } from '@/app/components/auth-provider';
 import { ProgressBar } from '@/app/components/progress-bar';
+import { ThemePicker } from '@/app/components/theme-picker';
 import type { Book } from '@/db/schema';
 
 export function MeView({
@@ -34,7 +35,7 @@ export function MeView({
     return (
       <div className="p-4">
         <div className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-lg font-semibold text-indigo-600">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--primary-soft)] text-lg font-semibold text-[var(--primary-text)]">
             {user.email.charAt(0).toUpperCase()}
           </div>
           <p className="min-w-0 flex-1 truncate text-sm font-medium text-gray-900">
@@ -48,7 +49,7 @@ export function MeView({
             <p className="text-sm text-gray-500">还没有学习记录，</p>
             <Link
               href="/"
-              className="mt-1 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500"
+              className="mt-1 inline-block text-sm font-medium text-[var(--primary-text)]"
             >
               去首页挑一本书吧
             </Link>
@@ -59,7 +60,7 @@ export function MeView({
               <li key={progress.bookId}>
                 <Link
                   href={`/study/${progress.bookId}`}
-                  className="block rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-colors hover:border-indigo-200"
+                  className="block rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-sm transition-colors hover:border-[var(--border-strong)]"
                 >
                   <p className="truncate text-sm font-medium text-gray-900">{book.title}</p>
                   <div className="mt-3 flex items-center gap-3">
@@ -73,6 +74,8 @@ export function MeView({
             ))}
           </ul>
         )}
+
+        <ThemePicker />
 
         <form action={signOutAction}>
           <button
@@ -90,13 +93,13 @@ export function MeView({
   return (
     <div className="p-4">
       <div className="flex flex-col items-center gap-4 rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--primary-soft)]">
           <svg
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth={1.5}
-            className="h-8 w-8 text-indigo-500"
+            className="h-8 w-8 text-[var(--primary)]"
             aria-hidden="true"
           >
             <path
@@ -111,11 +114,13 @@ export function MeView({
         <button
           type="button"
           onClick={() => setPopupOpen(true)}
-          className="h-10 w-full rounded-md bg-indigo-600 text-sm font-medium text-white transition-colors hover:bg-indigo-500"
+          className="h-10 w-full rounded-md bg-[var(--primary)] text-sm font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
         >
           登录 / 注册
         </button>
       </div>
+
+      <ThemePicker />
 
       <AuthPopup open={popupOpen} onOpenChange={setPopupOpen} />
     </div>

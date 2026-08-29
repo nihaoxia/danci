@@ -23,7 +23,7 @@ export default async function WordPage({
     return (
       <div className="flex flex-col items-center gap-2 p-8 pt-20 text-center">
         <p className="text-sm text-gray-500">单词不存在</p>
-        <Link href="/" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+        <Link href="/" className="text-sm font-medium text-[var(--primary-text)]">
           返回首页
         </Link>
       </div>
@@ -143,7 +143,7 @@ export default async function WordPage({
                   {s.tran}
                 </p>
                 {s.hwds && s.hwds.length > 0 && (
-                  <p className="mt-1 text-sm text-indigo-600">
+                  <p className="mt-1 text-sm text-[var(--primary-text)]">
                     {s.hwds.map((h) => h.w).join(' / ')}
                   </p>
                 )}

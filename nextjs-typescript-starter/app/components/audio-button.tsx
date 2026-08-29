@@ -20,7 +20,7 @@ export function AudioButton({
 
   // 预取：卡片/详情页渲染时就把当前词的音频拉进内存
   useEffect(() => {
-    prefetchWord(word, type).catch(() => {});
+    prefetchWord(word, type).catch(() => { });
   }, [word, type]);
 
   async function play(e?: React.MouseEvent) {
@@ -41,11 +41,10 @@ export function AudioButton({
     <button
       type="button"
       onClick={play}
-      className={`flex touch-manipulation select-none items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-        playing
-          ? 'animate-pulse border-indigo-300 bg-indigo-100 text-indigo-700'
-          : 'border-indigo-200 bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
-      }`}
+      className={`flex touch-manipulation select-none items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${playing
+          ? 'animate-pulse border-[var(--border-strong)] bg-[var(--primary)] text-white'
+          : 'border-[var(--border-strong)] bg-[var(--primary-soft)] text-[var(--primary-text)] hover:opacity-80'
+        }`}
       aria-label={`播放${label}发音`}
     >
       <svg

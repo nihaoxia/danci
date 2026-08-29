@@ -1,3 +1,114 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============ 主题系统 ============
+   变量在 html.theme-* 上切换；组件使用 bg-[var(--x)] 等引用。
+   默认（无 class / theme-green）：清新绿 */
+
+:root {
+  --bg-body: #e4efe7;
+  --bg-page: linear-gradient(180deg, #f2fbf5 0%, #e3f7e9 100%);
+  --card: #ffffff;
+  --card-soft: #f3f8f4;
+  --border: #e2eee5;
+  --border-strong: #a9dcb6;
+  --primary: #16a34a;
+  --primary-hover: #15803d;
+  --primary-soft: #e7f7ec;
+  --primary-text: #16a34a;
+}
+
+.theme-pink {
+  --bg-body: #f6dfe7;
+  --bg-page: linear-gradient(180deg, #fff5f7 0%, #fde8ef 100%);
+  --card: #ffffff;
+  --card-soft: #fdf2f6;
+  --border: #f6e3ea;
+  --border-strong: #f9b8cf;
+  --primary: #ec4899;
+  --primary-hover: #db2777;
+  --primary-soft: #fdeef4;
+  --primary-text: #ec4899;
+}
+
+.theme-red {
+  --bg-body: #f4d7d2;
+  --bg-page: linear-gradient(180deg, #fff5f3 0%, #fee6e2 100%);
+  --card: #ffffff;
+  --card-soft: #fef2f0;
+  --border: #f6e2de;
+  --border-strong: #f9b3ab;
+  --primary: #ef4444;
+  --primary-hover: #dc2626;
+  --primary-soft: #feeeec;
+  --primary-text: #ef4444;
+}
+
+.theme-purple {
+  --bg-body: #e4d9f4;
+  --bg-page: linear-gradient(180deg, #f8f4ff 0%, #efe6fd 100%);
+  --card: #ffffff;
+  --card-soft: #f6f1fd;
+  --border: #e9dff7;
+  --border-strong: #d4b3f5;
+  --primary: #9333ea;
+  --primary-hover: #7e22ce;
+  --primary-soft: #f4ebfe;
+  --primary-text: #9333ea;
+}
+
+.theme-dark {
+  --bg-body: #05080f;
+  --bg-page: linear-gradient(180deg, #0d1220 0%, #151b2c 100%);
+  --card: #1b2333;
+  --card-soft: #111827;
+  --border: #2a3142;
+  --border-strong: #3d4a66;
+  --primary: #818cf8;
+  --primary-hover: #6d76f0;
+  --primary-soft: #232c47;
+  --primary-text: #8fa0ff;
+}
+
+/* 深邃黑：反转中性灰文本/底色（Tailwind 类作用域覆盖） */
+.theme-dark .bg-white { background-color: #1b2333; }
+.theme-dark .bg-gray-50 { background-color: #141b2b; }
+.theme-dark .bg-gray-100 { background-color: #232c47; }
+.theme-dark .hover\:bg-gray-50:hover { background-color: #202940; }
+.theme-dark .hover\:bg-gray-100:hover { background-color: #273153; }
+.theme-dark .border-gray-100 { border-color: #2a3142; }
+.theme-dark .border-gray-200 { border-color: #334155; }
+.theme-dark .border-gray-300 { border-color: #3f4a63; }
+.theme-dark .text-gray-900 { color: #f9fafb; }
+.theme-dark .text-gray-800 { color: #f3f4f6; }
+.theme-dark .text-gray-700 { color: #e5e7eb; }
+.theme-dark .text-gray-600 { color: #d1d5db; }
+.theme-dark .text-gray-500 { color: #9ca3af; }
+.theme-dark .text-gray-400 { color: #6b7280; }
+
+.theme-pearl {
+  --bg-body: #e3ded4;
+  --bg-page: linear-gradient(180deg, #faf9f6 0%, #f1eee8 100%);
+  --card: #ffffff;
+  --card-soft: #f6f4ef;
+  --border: #e9e4da;
+  --border-strong: #d0c5b1;
+  --primary: #a08464;
+  --primary-hover: #8a6f53;
+  --primary-soft: #f4efe8;
+  --primary-text: #8a6f53;
+}
+
+.theme-blue {
+  --bg-body: #d3e2f2;
+  --bg-page: linear-gradient(180deg, #f0f7ff 0%, #ddeefd 100%);
+  --card: #ffffff;
+  --card-soft: #f0f6fd;
+  --border: #e0eaf5;
+  --border-strong: #a9c8f4;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-soft: #e8f1fe;
+  --primary-text: #2563eb;
+}

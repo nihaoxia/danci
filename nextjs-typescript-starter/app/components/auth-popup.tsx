@@ -80,7 +80,7 @@ export function AuthPopup({ open, onOpenChange }: AuthPopupProps) {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col space-y-3">
-          <div className="flex items-center rounded-md border border-gray-300 px-3 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
+          <div className="flex items-center rounded-md border border-gray-300 px-3 focus-within:border-[var(--primary)] focus-within:ring-1 focus-within:ring-[var(--primary)]">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -105,7 +105,7 @@ export function AuthPopup({ open, onOpenChange }: AuthPopupProps) {
             />
           </div>
 
-          <div className="flex items-center rounded-md border border-gray-300 px-3 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
+          <div className="flex items-center rounded-md border border-gray-300 px-3 focus-within:border-[var(--primary)] focus-within:ring-1 focus-within:ring-[var(--primary)]">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -136,7 +136,7 @@ export function AuthPopup({ open, onOpenChange }: AuthPopupProps) {
           <button
             type="submit"
             disabled={pending}
-            className="h-10 w-full rounded-md bg-indigo-600 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-60"
+            className="h-10 w-full rounded-md bg-[var(--primary)] text-sm font-medium text-white transition-colors hover:bg-[var(--primary-hover)] disabled:opacity-60"
           >
             {pending ? '请稍候…' : isLogin ? '登录' : '注册'}
           </button>
@@ -147,7 +147,7 @@ export function AuthPopup({ open, onOpenChange }: AuthPopupProps) {
           <button
             type="button"
             onClick={switchMode}
-            className="ml-1 font-medium text-indigo-600 hover:text-indigo-500"
+            className="ml-1 font-medium text-[var(--primary-text)]"
           >
             {isLogin ? '去注册' : '去登录'}
           </button>

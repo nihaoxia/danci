@@ -37,7 +37,7 @@ export function StudyView({
   if (cardWords.length === 0) {
     return (
       <EmptyState text="本书暂无单词">
-        <Link href="/" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+        <Link href="/" className="text-sm font-medium text-[var(--primary-text)]">
           返回首页
         </Link>
       </EmptyState>
