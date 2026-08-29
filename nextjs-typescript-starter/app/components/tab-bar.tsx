@@ -41,6 +41,7 @@ export function TabBar() {
           <Link
             key={tab.href}
             href={tab.href}
+            prefetch
             className={`flex flex-1 flex-col items-center justify-center gap-0.5 text-xs transition-colors ${active ? 'text-[var(--primary-text)]' : 'text-gray-400'
               }`}
           >
