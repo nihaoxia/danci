@@ -96,8 +96,10 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
   }
 
   return (
-    <div>
-      <div className="mb-2 flex items-center gap-3">
+    // 固定视口高度的纵向布局：进度条/按钮钉死两端，卡片占满剩余空间，
+    // 单词内容再长也只在卡片内部滚动，上一个/下一个位置不变
+    <div className="flex h-[calc(100dvh-5rem)] flex-col">
+      <div className="mb-2 flex shrink-0 items-center gap-3">
         {/* 学习进度条：上一个/下一个切换实时联动 */}
         <ProgressBar value={index + 1} total={words.length} className="flex-1" />
         <span className="shrink-0 text-xs text-gray-500">
@@ -124,10 +126,10 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
         />
       ) : (
         <>
-          {/* 整卡可点进详情；发音按钮内部已阻止冒泡 */}
+          {/* 整卡可点进详情；发音按钮内部已阻止冒泡；内容溢出时卡片内部滚动 */}
           <Link
             href={`/word/${bookId}/${current.rank}`}
-            className="block select-none touch-manipulation rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm transition-colors hover:border-[var(--border-strong)]"
+            className="block min-h-0 flex-1 select-none touch-manipulation overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm transition-colors hover:border-[var(--border-strong)]"
           >
             <div className="flex flex-col items-center py-4 text-center">
               <span className="text-3xl font-semibold text-gray-900">
@@ -163,7 +165,8 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
             </div>
           </Link>
 
-          <div className="mt-4 flex select-none gap-3">
+          {/* 按钮固定在底部：不随卡片内容长度移动 */}
+          <div className="mt-4 flex shrink-0 select-none gap-3">
             <button
               type="button"
               onClick={handlePrev}
