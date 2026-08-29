@@ -97,8 +97,9 @@ export function WordCard({ bookId, words, initialIndex }: WordCardProps) {
 
   return (
     // 固定视口高度的纵向布局：进度条/按钮钉死两端，卡片占满剩余空间，
-    // 单词内容再长也只在卡片内部滚动，上一个/下一个位置不变
-    <div className="flex h-[calc(100dvh-5rem)] flex-col">
+    // 单词内容再长也只在卡片内部滚动，上一个/下一个位置不变。
+    // 高度多留 4rem，让按钮悬在 TabBar 上方一截，无需滚动即可见
+    <div className="flex h-[calc(100dvh-9rem)] flex-col">
       <div className="mb-2 flex shrink-0 items-center gap-3">
         {/* 学习进度条：上一个/下一个切换实时联动 */}
         <ProgressBar value={index + 1} total={words.length} className="flex-1" />
