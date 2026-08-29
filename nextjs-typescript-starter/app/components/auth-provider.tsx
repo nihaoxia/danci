@@ -14,6 +14,7 @@ import type { Session } from 'next-auth';
 import { SessionProvider, useSession } from 'next-auth/react';
 
 import { fetchProgress, saveProgressApi, type BookProgress } from '@/lib/progress';
+import { initAudioEngine } from '@/lib/audio-engine';
 
 export interface ProfileInfo {
   nickname?: string | null;
@@ -43,6 +44,12 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
   const [progressList, setProgressList] = useState<BookProgress[]>([]);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [profile, setProfile] = useState<ProfileInfo>({});
+
+  // 发音引擎随全站初始化：提前创建 AudioContext 并注册"任意首次点击即解锁"，
+  // 把音频子系统冷启动成本移出发音按钮的点击路径
+  useEffect(() => {
+    initAudioEngine();
+  }, []);
 
   // 登录（或 session 恢复）后从数据库拉取进度与个人资料；未登录清空
   // 注意：不能用「已拉取过」标记做防重——StrictMode 下 effect 会挂载两次，
