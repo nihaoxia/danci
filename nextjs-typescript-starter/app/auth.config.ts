@@ -1,6 +1,9 @@
 import { NextAuthConfig } from 'next-auth';
 
 export const authConfig = {
+  // 生产环境部署在 EdgeOne/Vercel 等反向代理平台时必须信任主机，
+  // 否则所有 /api/auth/* 请求会被 UntrustedHost 拒绝导致无法登录
+  trustHost: true,
   pages: {
     // 未登录访问受保护页面时重定向到「我的」页，由 popup 完成登录
     signIn: '/me',
