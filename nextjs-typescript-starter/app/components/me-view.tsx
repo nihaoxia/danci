@@ -1,15 +1,16 @@
 'use client';
 
-// 「我的」页视图：未登录 → 引导卡片 + 登录/注册 popup；已登录 → 用户信息 + 学习进度
+// 「我的」页视图：未登录 → 引导卡片 + 登录/注册 popup；已登录 → 用户信息（头像/昵称/签名）+ 学习进度 + 设置
 // 单词书数据由服务端（app/me/page.tsx）从 books 表查询后传入，进度分母使用真实 wordCount
-// 登录态来自 NextAuth session（AuthProvider）；退出登录走 Server Action
+// 登录态来自 NextAuth session（AuthProvider）；退出登录/切换账号收进设置弹层
 import Link from 'next/link';
-import { useState } from 'react';
-import { signOutAction } from '@/app/actions/auth';
+import { useEffect, useState } from 'react';
+import * as Avatar from '@radix-ui/react-avatar';
 import { AuthPopup } from '@/app/components/auth-popup';
 import { useAuth } from '@/app/components/auth-provider';
 import { ProgressBar } from '@/app/components/progress-bar';
 import { ThemePicker } from '@/app/components/theme-picker';
+import { SettingsEntry, type Profile } from '@/app/components/profile-dialog';
 import type { Book } from '@/db/schema';
 
 export function MeView({
@@ -21,6 +22,25 @@ export function MeView({
 }) {
   const { user, progressList } = useAuth();
   const [popupOpen, setPopupOpen] = useState(autoOpenLogin);
+  const [profile, setProfile] = useState<Profile>({});
+
+  // 登录后拉取个人资料（昵称/签名/头像）
+  useEffect(() => {
+    if (!user) {
+      setProfile({});
+      return;
+    }
+    let cancelled = false;
+    fetch('/api/profile')
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data) => {
+        if (!cancelled) setProfile(data.profile ?? {});
+      })
+      .catch(() => { });
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   // 已登录视图
   if (user) {
@@ -31,16 +51,26 @@ export function MeView({
         (a, b) =>
           new Date(b.progress.updatedAt).getTime() - new Date(a.progress.updatedAt).getTime()
       );
+    const displayName = profile.nickname || user.email.split('@')[0];
 
     return (
       <div className="p-4">
         <div className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--primary-soft)] text-lg font-semibold text-[var(--primary-text)]">
-            {user.email.charAt(0).toUpperCase()}
+          {/* 头像（Radix Avatar：图片加载失败回退首字母） */}
+          <Avatar.Root className="h-12 w-12 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-[var(--primary-soft)]">
+            {profile.avatar && (
+              <Avatar.Image src={profile.avatar} className="h-full w-full object-cover" alt="头像" />
+            )}
+            <Avatar.Fallback className="flex h-full w-full items-center justify-center text-lg font-semibold text-[var(--primary-text)]">
+              {displayName.charAt(0).toUpperCase()}
+            </Avatar.Fallback>
+          </Avatar.Root>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-gray-900">{displayName}</p>
+            <p className="truncate text-xs text-gray-500">{profile.signature || user.email}</p>
           </div>
-          <p className="min-w-0 flex-1 truncate text-sm font-medium text-gray-900">
-            {user.email}
-          </p>
+          {/* 设置入口：修改资料 / 切换账号 / 退出登录都收在这里 */}
+          <SettingsEntry profile={profile} onSaved={setProfile} />
         </div>
 
         <h2 className="mb-2 mt-6 text-base font-semibold text-gray-900">学习进度</h2>
@@ -76,15 +106,6 @@ export function MeView({
         )}
 
         <ThemePicker />
-
-        <form action={signOutAction}>
-          <button
-            type="submit"
-            className="mt-8 h-10 w-full rounded-md border border-gray-200 bg-white text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
-          >
-            退出登录
-          </button>
-        </form>
       </div>
     );
   }
