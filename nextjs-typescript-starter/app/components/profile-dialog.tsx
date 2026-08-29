@@ -296,8 +296,8 @@ function EditView({
   );
 }
 
-/** 压缩头像：等比 cover 裁剪到 256×256 JPEG data URL */
-function compressImage(file: File): Promise<string> {
+/** 压缩头像：等比 cover 裁剪到 256×256 JPEG data URL（注册表单与资料编辑共用） */
+export function compressImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);

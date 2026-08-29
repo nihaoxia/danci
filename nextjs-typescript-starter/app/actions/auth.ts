@@ -4,8 +4,11 @@
 // 表单提交走 useTransition 直接调用（React 18 无 useActionState），返回 { error? }
 // 登录/注册成功时 signIn 会 throw NEXT_REDIRECT 完成导航（redirectTo = 当前页面路径）
 import { AuthError } from 'next-auth';
+import { eq } from 'drizzle-orm';
 import { signIn, signOut } from 'app/auth';
 import { createUser, getUser } from 'app/db';
+import { db } from '@/db';
+import { User } from '@/db/schema';
 
 export interface AuthActionState {
   error?: string;
@@ -37,7 +40,7 @@ export async function loginAction(
   return {};
 }
 
-/** 注册：邮箱查重 → bcrypt 加密入库 → 自动登录 */
+/** 注册：邮箱查重 → bcrypt 加密入库（含昵称/头像）→ 自动登录 */
 export async function registerAction(
   _prev: AuthActionState,
   formData: FormData
@@ -47,12 +50,20 @@ export async function registerAction(
     .toLowerCase();
   const password = String(formData.get('password') ?? '');
   const redirectTo = String(formData.get('redirectTo') ?? '/');
+  const nickname = String(formData.get('nickname') ?? '').trim();
+  const avatar = String(formData.get('avatar') ?? '');
 
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
     return { error: '请输入合法的邮箱地址' };
   }
   if (password.length < 6) {
     return { error: '密码至少需要 6 位' };
+  }
+  if (nickname.length > 20) {
+    return { error: '昵称不能超过 20 字' };
+  }
+  if (avatar && (!avatar.startsWith('data:image/') || avatar.length > 100 * 1024)) {
+    return { error: '头像格式或大小不符' };
   }
 
   try {
@@ -61,6 +72,16 @@ export async function registerAction(
       return { error: '该邮箱已注册，请直接登录' };
     }
     await createUser(email, password);
+    // 注册时一并保存昵称/头像，登录后各页面即可直接使用
+    if (nickname || avatar) {
+      await db
+        .update(User)
+        .set({
+          ...(nickname ? { nickname } : {}),
+          ...(avatar ? { avatar } : {}),
+        })
+        .where(eq(User.email, email));
+    }
     await signIn('credentials', { email, password, redirectTo });
   } catch (err) {
     if (err instanceof AuthError) {

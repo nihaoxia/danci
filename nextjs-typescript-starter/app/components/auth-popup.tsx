@@ -2,14 +2,17 @@
 
 // 登录 / 注册弹窗：两种模式在同一弹窗内切换
 // 表单提交走 Server Actions（app/actions/auth.ts），成功后由 signIn 重定向回当前页面
+// 注册模式额外提供头像（本地压缩）与昵称设置
 import { usePathname } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
+import * as Avatar from '@radix-ui/react-avatar';
 
 import {
   loginAction,
   registerAction,
   type AuthActionState,
 } from '@/app/actions/auth';
+import { compressImage } from '@/app/components/profile-dialog';
 
 interface AuthPopupProps {
   open: boolean;
@@ -21,6 +24,10 @@ export function AuthPopup({ open, onOpenChange }: AuthPopupProps) {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  // 注册模式：头像（null=未设置，''=已移除，dataURL=新头像）与昵称
+  const [regAvatar, setRegAvatar] = useState<string | null>(null);
+  const [regNickname, setRegNickname] = useState('');
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   if (!open) return null;
 
@@ -31,10 +38,35 @@ export function AuthPopup({ open, onOpenChange }: AuthPopupProps) {
     setError(null);
   }
 
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('请选择图片文件');
+      return;
+    }
+    try {
+      const dataUrl = await compressImage(file);
+      if (dataUrl.length > 100 * 1024) {
+        setError('图片过大，请换一张试试');
+        return;
+      }
+      setError(null);
+      setRegAvatar(dataUrl);
+    } catch {
+      setError('图片读取失败');
+    }
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     formData.set('redirectTo', pathname);
+    if (!isLogin) {
+      formData.set('nickname', regNickname);
+      if (regAvatar) formData.set('avatar', regAvatar);
+    }
     setError(null);
     startTransition(async () => {
       const action = isLogin ? loginAction : registerAction;
@@ -130,6 +162,76 @@ export function AuthPopup({ open, onOpenChange }: AuthPopupProps) {
               className="w-full bg-transparent px-2 py-2.5 text-sm outline-none placeholder:text-gray-400"
             />
           </div>
+
+          {!isLogin && (
+            <>
+              {/* 头像选择 */}
+              <div className="flex items-center gap-3 py-1">
+                <Avatar.Root className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-[var(--primary-soft)]">
+                  {regAvatar && (
+                    <Avatar.Image src={regAvatar} className="h-full w-full object-cover" alt="头像预览" />
+                  )}
+                  <Avatar.Fallback className="flex h-full w-full items-center justify-center text-lg font-semibold text-[var(--primary-text)]">
+                    {(regNickname || 'U').charAt(0).toUpperCase()}
+                  </Avatar.Fallback>
+                </Avatar.Root>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-gray-700">头像</span>
+                  <div className="flex gap-2 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => avatarInputRef.current?.click()}
+                      className="font-medium text-[var(--primary-text)]"
+                    >
+                      {regAvatar ? '更换' : '选择图片'}
+                    </button>
+                    {regAvatar && (
+                      <button
+                        type="button"
+                        onClick={() => setRegAvatar('')}
+                        className="text-gray-400"
+                      >
+                        移除
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                />
+              </div>
+
+              {/* 昵称 */}
+              <div className="flex items-center rounded-md border border-gray-300 px-3 focus-within:border-[var(--primary)] focus-within:ring-1 focus-within:ring-[var(--primary)]">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  className="h-4 w-4 shrink-0 text-gray-400"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  value={regNickname}
+                  maxLength={20}
+                  onChange={(e) => setRegNickname(e.target.value)}
+                  placeholder="昵称（20 字以内）"
+                  className="w-full bg-transparent px-2 py-2.5 text-sm outline-none placeholder:text-gray-400"
+                />
+              </div>
+            </>
+          )}
 
           {error && <p className="text-xs text-red-500">{error}</p>}
 

@@ -4,13 +4,13 @@
 // 单词书数据由服务端（app/me/page.tsx）从 books 表查询后传入，进度分母使用真实 wordCount
 // 登录态来自 NextAuth session（AuthProvider）；退出登录/切换账号收进设置弹层
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import * as Avatar from '@radix-ui/react-avatar';
 import { AuthPopup } from '@/app/components/auth-popup';
 import { useAuth } from '@/app/components/auth-provider';
 import { ProgressBar } from '@/app/components/progress-bar';
 import { ThemePicker } from '@/app/components/theme-picker';
-import { SettingsEntry, type Profile } from '@/app/components/profile-dialog';
+import { SettingsEntry } from '@/app/components/profile-dialog';
 import type { Book } from '@/db/schema';
 
 export function MeView({
@@ -20,27 +20,8 @@ export function MeView({
   books: Book[];
   autoOpenLogin: boolean;
 }) {
-  const { user, progressList } = useAuth();
+  const { user, profile, setProfile, progressList } = useAuth();
   const [popupOpen, setPopupOpen] = useState(autoOpenLogin);
-  const [profile, setProfile] = useState<Profile>({});
-
-  // 登录后拉取个人资料（昵称/签名/头像）
-  useEffect(() => {
-    if (!user) {
-      setProfile({});
-      return;
-    }
-    let cancelled = false;
-    fetch('/api/profile')
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data) => {
-        if (!cancelled) setProfile(data.profile ?? {});
-      })
-      .catch(() => { });
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
 
   // 已登录视图
   if (user) {

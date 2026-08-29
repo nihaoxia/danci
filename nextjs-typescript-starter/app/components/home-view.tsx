@@ -8,7 +8,7 @@ import { ProgressBar } from '@/app/components/progress-bar';
 import type { Book } from '@/db/schema';
 
 export function HomeView({ books }: { books: Book[] }) {
-  const { user, hydrated, progressList } = useAuth();
+  const { user, hydrated, profile, progressList } = useAuth();
 
   if (!hydrated) {
     return <p className="p-8 text-center text-sm text-gray-400">加载中…</p>;
@@ -39,7 +39,9 @@ export function HomeView({ books }: { books: Book[] }) {
       >
         {user ? (
           <>
-            <p className="text-xs opacity-80">Hi，{user.email.split('@')[0]}</p>
+            <p className="text-xs opacity-80">
+              Hi，{profile.nickname || user.email.split('@')[0]}
+            </p>
             <div className="mt-1 flex items-baseline gap-1">
               <span className="text-3xl font-bold">已学 {totalLearned}</span>
               <span className="text-sm opacity-80">词</span>

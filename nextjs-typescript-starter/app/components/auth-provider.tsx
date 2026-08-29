@@ -15,6 +15,12 @@ import { SessionProvider, useSession } from 'next-auth/react';
 
 import { fetchProgress, saveProgressApi, type BookProgress } from '@/lib/progress';
 
+export interface ProfileInfo {
+  nickname?: string | null;
+  signature?: string | null;
+  avatar?: string | null;
+}
+
 interface AuthUser {
   email: string;
 }
@@ -22,6 +28,8 @@ interface AuthUser {
 interface AuthContextValue {
   user: AuthUser | null;
   hydrated: boolean;
+  profile: ProfileInfo;
+  setProfile: (profile: ProfileInfo) => void;
   progressList: BookProgress[];
   getProgress: (bookId: string) => BookProgress | null;
   saveProgress: (bookId: string, wordRank: number) => void;
@@ -34,14 +42,16 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
   const email = session?.user?.email?.toLowerCase() ?? null;
   const [progressList, setProgressList] = useState<BookProgress[]>([]);
   const [progressLoaded, setProgressLoaded] = useState(false);
+  const [profile, setProfile] = useState<ProfileInfo>({});
 
-  // 登录（或 session 恢复）后从数据库拉取进度；未登录清空
+  // 登录（或 session 恢复）后从数据库拉取进度与个人资料；未登录清空
   // 注意：不能用「已拉取过」标记做防重——StrictMode 下 effect 会挂载两次，
   // 第一次请求被 cleanup 取消后，第二次会被标记挡住，导致刷新后进度永远拉不回来
   useEffect(() => {
     if (!email) {
       setProgressList([]);
       setProgressLoaded(false);
+      setProfile({});
       return;
     }
     let cancelled = false;
@@ -51,6 +61,12 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
         setProgressLoaded(true);
       }
     });
+    fetch('/api/profile')
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data) => {
+        if (!cancelled) setProfile(data.profile ?? {});
+      })
+      .catch(() => { });
     return () => {
       cancelled = true;
     };
@@ -102,8 +118,16 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
   const hydrated = status !== 'loading' && (!email || progressLoaded);
 
   const value = useMemo(
-    () => ({ user: email ? { email } : null, hydrated, progressList, getProgress, saveProgress }),
-    [email, hydrated, progressList, getProgress, saveProgress]
+    () => ({
+      user: email ? { email } : null,
+      hydrated,
+      profile,
+      setProfile,
+      progressList,
+      getProgress,
+      saveProgress,
+    }),
+    [email, hydrated, profile, progressList, getProgress, saveProgress]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
