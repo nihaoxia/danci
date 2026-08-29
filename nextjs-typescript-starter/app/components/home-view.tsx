@@ -34,7 +34,7 @@ export function HomeView({ books }: { books: Book[] }) {
     <div className="pb-4">
       {/* Hero：主题渐变区 */}
       <div
-        className="mx-4 mt-10 rounded-3xl p-5 text-white shadow-md"
+        className="mx-4 mt-4 rounded-3xl px-5 pb-5 pt-9 text-white shadow-md"
         style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))' }}
       >
         {user ? (
