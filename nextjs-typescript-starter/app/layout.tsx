@@ -24,8 +24,6 @@ export default async function RootLayout({
   return (
     <html lang="zh-CN">
       <body className={`${GeistSans.variable} bg-gray-100`}>
-        {/* 预连接有道发音 CDN：提前完成 DNS + TLS，首次点击发音无需建连等待 */}
-        <link rel="preconnect" href="https://dict.youdao.com" />
         <AuthProvider session={session}>
           <div className="mx-auto min-h-screen max-w-md bg-gray-50 pb-16 shadow-sm">
             {children}

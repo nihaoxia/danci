@@ -2,16 +2,25 @@ import { randomUUID } from 'node:crypto';
 import { sql } from 'drizzle-orm';
 import {
   bigserial,
+  customType,
   index,
   integer,
   json,
   pgTable,
   serial,
+  smallint,
   text,
   timestamp,
   unique,
   varchar,
 } from 'drizzle-orm/pg-core';
+
+// bytea 自定义类型（音频二进制）
+const bytea = customType<{ data: Buffer; default: false }>({
+  dataType() {
+    return 'bytea';
+  },
+});
 
 // 认证用户表（与 app/db.ts 中 ensureTableExists 的建表逻辑保持一致）
 export const users = pgTable('User', {
@@ -138,3 +147,31 @@ export const userWordProgress = pgTable(
 );
 
 export type UserWordProgress = typeof userWordProgress.$inferSelect;
+
+// ---------- 发音缓存（2026-08-28 新增） ----------
+
+// 发音音频缓存：首次请求时代理取有道并入库，之后全部走 DB（同词跨书复用）
+// 以 (word, type) 为键与 bookId/rank 解耦；预计几千词 × 30KB ≈ 百 MB 级，按需增长
+export const pronunciationCache = pgTable(
+  'pronunciation_cache',
+  {
+    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    word: varchar('word', { length: 64 }).notNull(),
+    type: smallint('type').notNull(), // 1=英音 2=美音
+    contentType: varchar('content_type', { length: 64 })
+      .notNull()
+      .default('audio/mpeg'),
+    data: bytea('data').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => ({
+    wordTypeUniq: unique('pronunciation_cache_word_type_unique').on(
+      table.word,
+      table.type
+    ),
+  })
+);
+
+export type PronunciationCache = typeof pronunciationCache.$inferSelect;

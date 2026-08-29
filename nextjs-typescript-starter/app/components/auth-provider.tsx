@@ -101,14 +101,6 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
 
   const hydrated = status !== 'loading' && (!email || progressLoaded);
 
-  // 预热发音 CDN：进入应用时建立一次 keep-alive 连接（并让浏览器缓存 DNS/TLS），
-  // 否则登录后第一次点发音要先建连，会有明显延迟；预热后首次点击即秒出声
-  useEffect(() => {
-    fetch('https://dict.youdao.com/dictvoice?audio=ok&type=1', { mode: 'no-cors' }).catch(() => {
-      // 预热失败无所谓，播放时浏览器会自行建连
-    });
-  }, []);
-
   const value = useMemo(
     () => ({ user: email ? { email } : null, hydrated, progressList, getProgress, saveProgress }),
     [email, hydrated, progressList, getProgress, saveProgress]
