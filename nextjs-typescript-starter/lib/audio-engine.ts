@@ -34,7 +34,7 @@ function ensureUnlock() {
   document.addEventListener(
     'pointerdown',
     () => {
-      getCtx()?.resume().catch(() => {});
+      getCtx()?.resume().catch(() => { });
     },
     { once: true, capture: true }
   );
@@ -61,24 +61,32 @@ export function prefetchWord(word: string, type: 1 | 2): Promise<ArrayBuffer> {
   return p;
 }
 
-/** 播放单词发音 */
+/** 播放单词发音；Web Audio 失败时自动降级为 <audio> 元素播放 */
 export async function playWord(word: string, type: 1 | 2): Promise<void> {
   ensureUnlock();
   const audioCtx = getCtx();
   if (!audioCtx) return; // 浏览器不支持 Web Audio 时静默放弃
 
-  await audioCtx.resume().catch(() => {});
   const key = cacheKey(word, type);
 
-  let decoded = decodedCache.get(key);
-  if (!decoded) {
-    const data = await prefetchWord(word, type);
-    decoded = await audioCtx.decodeAudioData(data.slice(0)); // slice 防止原始 buffer 被 detach
-    decodedCache.set(key, decoded);
-  }
+  try {
+    await audioCtx.resume().catch(() => { });
 
-  const source = audioCtx.createBufferSource();
-  source.buffer = decoded;
-  source.connect(audioCtx.destination);
-  source.start();
+    let decoded = decodedCache.get(key);
+    if (!decoded) {
+      const data = await prefetchWord(word, type);
+      decoded = await audioCtx.decodeAudioData(data.slice(0)); // slice 防止原始 buffer 被 detach
+      decodedCache.set(key, decoded);
+    }
+
+    const source = audioCtx.createBufferSource();
+    source.buffer = decoded;
+    source.connect(audioCtx.destination);
+    source.start();
+  } catch {
+    // 降级路径：Web Audio 解码失败（如拿到损坏/未知编码数据）时，
+    // 用 DOM audio 播放同一 URL —— 它的解码容错能力更强
+    const audio = new Audio(`/api/audio?word=${encodeURIComponent(word)}&type=${type}`);
+    audio.play().catch(() => { }); // 全部失败则保持安静，不抛错崩页
+  }
 }

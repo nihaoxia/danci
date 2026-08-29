@@ -7,7 +7,25 @@ import { genSaltSync, hashSync } from 'bcrypt-ts';
 // Optionally, if not using email/pass login, you can
 // use the Drizzle adapter for Auth.js / NextAuth
 // https://authjs.dev/reference/adapter/drizzle
-let client = postgres(`${process.env.POSTGRES_URL!}?sslmode=require`);
+//
+// 全局单例（挂在 globalThis 上）：Next dev 热更新会重新执行本模块，
+// 普通模块级变量会被重建为新连接池，反复热更新就会把 Supabase session 池（上限 15）占满，
+// 导致所有 DB 操作随机报 EMAXCONNSESSION。挂到 globalThis 可跨热更新复用同一实例。
+const globalForDb = globalThis as unknown as {
+  __authSqlClient?: ReturnType<typeof postgres>;
+};
+
+const client =
+  globalForDb.__authSqlClient ??
+  postgres(`${process.env.POSTGRES_URL!}?sslmode=require`, {
+    max: 2,
+    prepare: false, // Supabase pooler（PgBouncer）不支持 prepared statements
+  });
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForDb.__authSqlClient = client;
+}
+
 let db = drizzle(client);
 
 export async function getUser(email: string) {

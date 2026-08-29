@@ -146,6 +146,20 @@ export const userWordProgress = pgTable(
   })
 );
 
+// ---------- 认证用户（NextAuth Credentials，表由 app/db.ts 自动创建） ----------
+// 2026-08-28 新增个人资料列：nickname / signature / avatar（data URL，前端压缩后存储）
+
+export const User = pgTable('User', {
+  id: serial('id').primaryKey(),
+  email: varchar('email', { length: 64 }),
+  password: varchar('password', { length: 64 }),
+  nickname: varchar('nickname', { length: 32 }),
+  signature: varchar('signature', { length: 60 }),
+  avatar: text('avatar'),
+});
+
+export type UserProfileRow = typeof User.$inferSelect;
+
 export type UserWordProgress = typeof userWordProgress.$inferSelect;
 
 // ---------- 发音缓存（2026-08-28 新增） ----------

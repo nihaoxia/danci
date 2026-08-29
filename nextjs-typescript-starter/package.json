@@ -5,7 +5,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:migrate": "node scripts/migrate.mjs"
+    "db:migrate": "node scripts/migrate.mjs",
+    "warmup-audio": "node scripts/warmup-audio.mjs"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.2.6",
