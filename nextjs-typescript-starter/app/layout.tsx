@@ -5,7 +5,6 @@ import { auth } from 'app/auth';
 import { AuthProvider } from '@/app/components/auth-provider';
 import { TabBar } from '@/app/components/tab-bar';
 import { ThemeProvider } from '@/app/components/theme-provider';
-import { ThemeDeco } from '@/app/components/theme-deco';
 
 const title = '单词学习';
 const description = '移动端单词学习 H5：卡片式背单词，记录学习进度';
@@ -36,7 +35,6 @@ export default async function RootLayout({
               className="mx-auto min-h-screen max-w-md pb-16 shadow-sm"
               style={{ background: 'var(--bg-page)' }}
             >
-              <ThemeDeco />
               {children}
             </div>
             <TabBar />

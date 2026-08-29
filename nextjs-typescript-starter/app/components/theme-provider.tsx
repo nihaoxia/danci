@@ -11,13 +11,13 @@ import {
 } from 'react';
 
 export const THEMES = [
-  { key: 'green', name: '清新绿', emoji: '🍃', preview: 'linear-gradient(135deg, #dcfce7, #6ee7a0)' },
-  { key: 'pink', name: '樱花粉', emoji: '🌸', preview: 'linear-gradient(135deg, #fce7f3, #f7a8c9)' },
-  { key: 'red', name: '热情红', emoji: '☀️', preview: 'linear-gradient(135deg, #fee2e2, #f8a09a)' },
-  { key: 'purple', name: '神秘紫', emoji: '🌙', preview: 'linear-gradient(135deg, #f3e8ff, #b57ee8)' },
-  { key: 'dark', name: '深邃黑', emoji: '✨', preview: 'linear-gradient(135deg, #2c3752, #0d1220)' },
-  { key: 'pearl', name: '珍珠白', emoji: '🤍', preview: 'linear-gradient(135deg, #ffffff, #ddd3c2)' },
-  { key: 'blue', name: '大海蓝', emoji: '🌊', preview: 'linear-gradient(135deg, #dbeafe, #7db1f5)' },
+  { key: 'green', name: '清新绿', preview: 'linear-gradient(135deg, #dcfce7, #6ee7a0)' },
+  { key: 'pink', name: '樱花粉', preview: 'linear-gradient(135deg, #fce7f3, #f7a8c9)' },
+  { key: 'red', name: '热情红', preview: 'linear-gradient(135deg, #fee2e2, #f8a09a)' },
+  { key: 'purple', name: '神秘紫', preview: 'linear-gradient(135deg, #f3e8ff, #b57ee8)' },
+  { key: 'dark', name: '深邃黑', preview: 'linear-gradient(135deg, #2c3752, #0d1220)' },
+  { key: 'pearl', name: '珍珠白', preview: 'linear-gradient(135deg, #ffffff, #ddd3c2)' },
+  { key: 'blue', name: '大海蓝', preview: 'linear-gradient(135deg, #dbeafe, #7db1f5)' },
 ] as const;
 
 export type ThemeKey = (typeof THEMES)[number]['key'];
@@ -39,7 +39,7 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue>({
   theme: DEFAULT_THEME,
-  setTheme: () => {},
+  setTheme: () => { },
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
